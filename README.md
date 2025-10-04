@@ -50,13 +50,17 @@ make
 - ○ - Right mouse button
 - □ - Attack
 - △ - Stop (Guard)
-- D-Pad Up/Right/Down/Left - 1/2/3/4 button
-- L1 - Ctrl
-- R1 - Shift (also used for cursor movement speedup)
-- SELECT - Esc (Menu)
-- START - Space (Pause)
+- L1 - 1 key
+- L2 - 2 key
+- D-Pad Left - 3 key
+- D-Pad Right - Modifies touches to right mouse button clicks when held down
+- D-Pad Up - Cycle through construction yards
+- D-Pad Down - Cycle through factories and other builders
 
-Use L1 + D-Pad to create teams (1-4) and D-Pad to select them (same as Ctrl + 1-4 on keyboard).
+- SELECT - Ctrl
+- START - Esc (Menu)
+
+Hold down SELECT and press L1, L2 or D-Pad Left to create teams (1-3). Pressing those keys without holding down SELECT will select them again (same as Ctrl + 1-3 on keyboard).
 
 You can change cursor movement speed by editing `ux0:data/dunelegacy/Dune Legacy.ini` and changing the `Controller Speed` option.
 

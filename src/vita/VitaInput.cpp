@@ -1,5 +1,7 @@
 #include "vita/VitaInput.h"
 #include "DataTypes.h"
+#include <Game.h>
+#include <globals.h>
 
 extern SettingsClass    settings;
 
@@ -9,6 +11,7 @@ namespace VitaInput
     bool rightScrollActive = false;
     bool upScrollActive = false;
     bool downScrollActive = false;
+    Uint8 touchButton = SDL_BUTTON_LEFT;
 
     void OpenController()
     {
@@ -65,10 +68,6 @@ namespace VitaInput
 
     void HandleTouchEvent(const SDL_TouchFingerEvent& event)
     {
-        // ignore back touchpad
-        if (event.touchId != 0)
-            return;
-
         if (event.type == SDL_FINGERDOWN) {
             ++numTouches;
             if (numTouches == 1) {
@@ -76,6 +75,10 @@ namespace VitaInput
             }
         } else if (event.type == SDL_FINGERUP) {
             --numTouches;
+        }
+
+        if (currentGame) {
+            currentGame->hideCursor(true);
         }
 
         if (firstFingerId == event.fingerId) {
@@ -103,7 +106,7 @@ namespace VitaInput
             if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP) {
                 SDL_Event ev2;
                 ev2.type = (event.type == SDL_FINGERDOWN) ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
-                ev2.button.button = SDL_BUTTON_LEFT;
+                ev2.button.button = touchButton;
                 ev2.button.x = emulatedPointerPosX;
                 ev2.button.y = emulatedPointerPosY;
                 SDL_PushEvent(&ev2);
@@ -166,6 +169,10 @@ namespace VitaInput
                 controllerRightYAxis = motion.value;
             else
                 controllerRightYAxis = 0;
+        }
+
+        if (currentGame && (controllerLeftXAxis != 0 || controllerLeftYAxis != 0)) {
+            currentGame->hideCursor(false);
         }
 
         //map scroll
@@ -266,6 +273,11 @@ namespace VitaInput
         }
     }
 
+    void setTouchAs(Uint8 mouseBtn)
+    {
+        touchButton = mouseBtn;
+    }
+
     void HandleControllerButtonEvent(const SDL_ControllerButtonEvent& button)
     {
         bool keyboardPress = false;
@@ -295,60 +307,53 @@ namespace VitaInput
             break;
         case SDL_CONTROLLER_BUTTON_BACK:
             keyboardPress = true;
-            scancode = SDL_SCANCODE_ESCAPE;
-            keycode = SDLK_ESCAPE;
-            break;
-        case SDL_CONTROLLER_BUTTON_START:
-            keyboardPress = true;
-            scancode = SDL_SCANCODE_SPACE;
-            keycode = SDLK_SPACE;
-            break;
-        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            keyboardPress = true;
             scancode = SDL_SCANCODE_LCTRL;
             keycode = SDLK_LCTRL;
-
+            
             if (button.type == SDL_CONTROLLERBUTTONDOWN)
                 SDL_SetModState(KMOD_CTRL);
             else
-                SDL_SetModState(KMOD_NONE);
+                SDL_SetModState(KMOD_NONE);	
 
             break;
-        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+        case SDL_CONTROLLER_BUTTON_START:
             keyboardPress = true;
-            scancode = SDL_SCANCODE_RSHIFT;
-            keycode = SDLK_RSHIFT;
-
-            if (button.type == SDL_CONTROLLERBUTTONDOWN)
-                SDL_SetModState(KMOD_SHIFT);
-            else
-                SDL_SetModState(KMOD_NONE);
-
-            if (button.type == SDL_CONTROLLERBUTTONDOWN) {
-                cursorSpeedup = 2.0f;
-            } else {
-                cursorSpeedup = 1.0f;
-            }
+            scancode = SDL_SCANCODE_ESCAPE;
+            keycode = SDLK_ESCAPE;
             break;
-        case SDL_CONTROLLER_BUTTON_DPAD_UP:
+        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
             keyboardPress = true;
             scancode = SDL_SCANCODE_1;
             keycode = SDLK_1;
             break;
-        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
             keyboardPress = true;
             scancode = SDL_SCANCODE_2;
             keycode = SDLK_2;
             break;
+        case SDL_CONTROLLER_BUTTON_DPAD_UP:
+            keyboardPress = true;
+            scancode = SDL_SCANCODE_G;
+            keycode = SDLK_g;
+            break;
+        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+            // used as modifier for touches on the Vita screen;
+            // when holding this key down, a touch on the screen
+            // will be registered as right mouse button click there
+            if (button.type == SDL_CONTROLLERBUTTONDOWN)
+                setTouchAs(SDL_BUTTON_RIGHT);
+            else
+                setTouchAs(SDL_BUTTON_LEFT);
+            break;
         case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
             keyboardPress = true;
-            scancode = SDL_SCANCODE_3;
-            keycode = SDLK_3;
+            scancode = SDL_SCANCODE_F;
+            keycode = SDLK_f;
             break;
         case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
             keyboardPress = true;
-            scancode = SDL_SCANCODE_4;
-            keycode = SDLK_4;
+            scancode = SDL_SCANCODE_3;
+            keycode = SDLK_3;
             break;
         default:
             break;

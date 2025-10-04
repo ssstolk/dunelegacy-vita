@@ -83,6 +83,11 @@ public:
         \param  newGameInitSettings the game init settings to initialize the game
     */
     void initGame(const GameInitSettings& newGameInitSettings);
+    
+    /**
+        Hides or shows the mouse cursor
+    */
+    void hideCursor(bool enabled);
 
     /**
         Initializes a replay from the specified filename
@@ -529,6 +534,7 @@ public:
     GameState   gameState = GameState::Start;
 
 private:
+    bool        cursorHidden = false; ///< mouse cursor hidden?
     bool        chatMode = false;   ///< chat mode on?
     std::string typingChatMessage;  ///< currently typed chat message
 

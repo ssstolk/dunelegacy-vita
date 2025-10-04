@@ -403,6 +403,7 @@ int main(int argc, char *argv[]) {
     SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
 #ifdef __vita__
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+    SDL_setenv("VITA_DISABLE_TOUCH_BACK", "1", 1);
     scePowerSetArmClockFrequency(444);
     scePowerSetBusClockFrequency(222);
     scePowerSetGpuClockFrequency(222);

@@ -75,7 +75,7 @@
 
 Game::Game() {
     currentZoomlevel = settings.video.preferredZoomLevel;
-
+    
     localPlayerName = settings.general.playerName;
 
     unitList.clear();       //holds all the units
@@ -178,6 +178,10 @@ void Game::initGame(const GameInitSettings& newGameInitSettings) {
         default: {
         } break;
     }
+}
+
+void Game::hideCursor(bool enabled) {
+    cursorHidden = enabled;
 }
 
 void Game::initReplay(const std::string& filename) {
@@ -857,6 +861,11 @@ void Game::doInput()
 
 void Game::drawCursor() const
 {
+
+    if (cursorHidden) {
+        return;
+    }
+    
 #ifndef __vita__
     if(!(SDL_GetWindowFlags(window) & SDL_WINDOW_MOUSE_FOCUS)) {
         return;
